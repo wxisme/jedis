@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import redis.clients.util.JedisClusterHashTagUtil;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocketFactory;
+
 public class BinaryJedisCluster implements BasicCommands, BinaryJedisClusterCommands,
     MultiKeyBinaryJedisClusterCommands, JedisClusterBinaryScriptingCommands, Closeable {
 
@@ -58,6 +62,19 @@ public class BinaryJedisCluster implements BasicCommands, BinaryJedisClusterComm
   public BinaryJedisCluster(Set<HostAndPort> jedisClusterNode, int connectionTimeout, int soTimeout, int maxAttempts, String password, String clientName, GenericObjectPoolConfig poolConfig) {
     this.connectionHandler = new JedisSlotBasedConnectionHandler(jedisClusterNode, poolConfig,
             connectionTimeout, soTimeout, password, clientName);
+    this.maxAttempts = maxAttempts;
+  }
+  
+  public BinaryJedisCluster(Set<HostAndPort> jedisClusterNode, int connectionTimeout, int soTimeout, int maxAttempts, String password, String clientName, GenericObjectPoolConfig poolConfig,
+                            boolean ssl) {
+    this(jedisClusterNode, connectionTimeout, soTimeout, maxAttempts, password, clientName, poolConfig, ssl, null, null, null, null);
+  }
+  
+  public BinaryJedisCluster(Set<HostAndPort> jedisClusterNode, int connectionTimeout, int soTimeout, int maxAttempts, String password, String clientName, GenericObjectPoolConfig poolConfig,
+                            boolean ssl, SSLSocketFactory sslSocketFactory, SSLParameters sslParameters, 
+                            HostnameVerifier hostnameVerifier, JedisClusterHostAndPortMap hostAndPortMap) {
+    this.connectionHandler = new JedisSlotBasedConnectionHandler(jedisClusterNode, poolConfig,
+            connectionTimeout, soTimeout, password, clientName, ssl, sslSocketFactory, sslParameters, hostnameVerifier, hostAndPortMap);
     this.maxAttempts = maxAttempts;
   }
 
